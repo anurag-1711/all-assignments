@@ -1,4 +1,3 @@
-
 import React from "react";
 
 /// This is the landing page. You need to add a link to the login page here.

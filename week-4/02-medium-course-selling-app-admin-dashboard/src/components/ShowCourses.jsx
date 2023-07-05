@@ -1,20 +1,52 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 function ShowCourses() {
-    const [courses, setCourses] = React.useState([]);
+  const [courses, setCourses] = useState([]);
 
-    // Add code to fetch courses from the server
-    // and set it in the courses state variable.
-    return <div>
-        <h1>Create Course Page</h1>
-        {courses.map(c => <Course title={c.title} />)}
+  useEffect(() => {
+    getCourses();
+  }, []);
+
+  const getCourses = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch("http://localhost:3000/admin/courses", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    setCourses(data.courses);
+  };
+
+  // Add code to fetch courses from the server
+  // and set it in the courses state variable.
+
+  if (!courses.length) {
+    return;
+  }
+
+  return (
+    <div>
+      <h1>Show Course Page</h1>
+      <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}>
+        {courses.map((c) => (
+          <Course key={c._id} {...c} />
+        ))}
+      </div>
     </div>
+  );
 }
 
-function Course(props) {
-    return <div>
-        <h1>{props.title}</h1>
+function Course({ title, description, price }) {
+  return (
+    <div
+      style={{ marginRight: "20px", border: "1px solid black", width: "150px" }}
+    >
+      <h2>{title}</h2>
+      <h3>{description}</h3>
+      <h4>Price: {price}</h4>
     </div>
+  );
 }
 
 export default ShowCourses;

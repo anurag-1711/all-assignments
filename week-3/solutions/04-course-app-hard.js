@@ -9,7 +9,7 @@ const SECRET = 'SECr3t';  // This should be in an environment variable in a real
 
 // Define mongoose schemas
 const userSchema = new mongoose.Schema({
-  username: {type: String},
+  username: { type: String },
   password: String,
   purchasedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
 });
@@ -50,7 +50,7 @@ const authenticateJwt = (req, res, next) => {
 
 // Connect to MongoDB
 // DONT MISUSE THIS THANKYOU!!
-mongoose.connect('mongodb+srv://kirattechnologies:iRbi4XRDdM7JMMkl@cluster0.e95bnsi.mongodb.net/courses', { useNewUrlParser: true, useUnifiedTopology: true, dbName: "courses" });
+mongoose.connect('mongodb+srv://anurag:anurag@cluster0.spqvxyc.mongodb.net/course-selling-app', { useNewUrlParser: true, useUnifiedTopology: true, dbName: "courses" });
 
 app.post('/admin/signup', (req, res) => {
   const { username, password } = req.body;
@@ -126,7 +126,7 @@ app.post('/users/login', async (req, res) => {
 });
 
 app.get('/users/courses', authenticateJwt, async (req, res) => {
-  const courses = await Course.find({published: true});
+  const courses = await Course.find({ published: true });
   res.json({ courses });
 });
 
