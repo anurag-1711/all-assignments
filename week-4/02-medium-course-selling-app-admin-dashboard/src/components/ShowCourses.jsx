@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function ShowCourses() {
   const [courses, setCourses] = useState([]);
@@ -30,7 +31,9 @@ function ShowCourses() {
       <h1>Show Course Page</h1>
       <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}>
         {courses.map((c) => (
-          <Course key={c._id} {...c} />
+          <Link to={`/course/${c._id}`} key={c._id}>
+            <Course {...c} />
+          </Link>
         ))}
       </div>
     </div>
