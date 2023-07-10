@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import { CardActionArea } from "@mui/material";
 
 function ShowCourses() {
   const [courses, setCourses] = useState([]);
@@ -28,10 +33,24 @@ function ShowCourses() {
 
   return (
     <div>
-      <h1>Show Course Page</h1>
-      <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}>
+      <Typography
+        variant="h4"
+        component="div"
+        style={{
+          textAlign: "center",
+        }}
+      >
+        Courses
+      </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          flexWrap: "wrap",
+        }}
+      >
         {courses.map((c) => (
-          <Link to={`/course/${c._id}`} key={c._id}>
+          <Link to={`/course/${c._id}`} key={c._id} style={{ margin: "20px" }}>
             <Course {...c} />
           </Link>
         ))}
@@ -42,12 +61,28 @@ function ShowCourses() {
 
 function Course({ title, description, price }) {
   return (
-    <div
-      style={{ marginRight: "20px", border: "1px solid black", width: "150px" }}
-    >
-      <h2>{title}</h2>
-      <h3>{description}</h3>
-      <h4>Price: {price}</h4>
+    <div>
+      <Card sx={{ width: 345 }}>
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            height="140"
+            image="https://source.unsplash.com/random"
+            alt="Course"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {price}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
     </div>
   );
 }

@@ -1,26 +1,33 @@
+import {
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  atom,
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+} from "recoil";
 
 const CoursePage = () => {
-  const [course, setCourse] = useState({});
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [imageLink, setImageLink] = useState("");
-  const [published, setPublished] = useState(false);
-
-  const [editMode, setEditMode] = useState(false);
+  // const [course, setCourse] = useState({});
+  const setCourse = useSetRecoilState(courseState);
 
   useEffect(() => {
     getCourse();
   }, []);
 
   const { courseId } = useParams();
-  //   console.log);
 
   const getCourse = async () => {
     const token = localStorage.getItem("token");
-    // console.log(token);
     const res = await fetch(`http://localhost:3000/admin/courses/${courseId}`, {
       method: "GET",
       headers: {
@@ -29,113 +36,175 @@ const CoursePage = () => {
     });
     const data = await res.json();
     setCourse(data);
-    setTitle(data.title);
-    setDescription(data.description);
-    setPrice(data.price);
-    setImageLink(data.imageLink);
-    setPublished(data.published);
-    console.log(data.published);
-  };
-
-  const handleEdit = async () => {
-    setEditMode(true);
-  };
-
-  const handleSubmit = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:3000/admin/courses/${courseId}`, {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        price,
-        imageLink,
-        published,
-      }),
-    });
-
-    const data = await res.json();
-    console.log(data);
-
-    getCourse();
-
-    setEditMode(false);
   };
 
   return (
-    <div>
-      <h2>
-        Title:{" "}
-        {!editMode ? (
-          course.title
-        ) : (
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        )}
-      </h2>
-      <h3>
-        Description:{" "}
-        {!editMode ? (
-          course.description
-        ) : (
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        )}
-      </h3>
-      <h3>
-        Price:{" "}
-        {!editMode ? (
-          course.price
-        ) : (
-          <input
-            type="text"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        )}
-      </h3>
-      <h3>
-        ImageLink:{" "}
-        {!editMode ? (
-          course.imageLink
-        ) : (
-          <input
-            type="text"
-            value={imageLink}
-            onChange={(e) => setImageLink(e.target.value)}
-          />
-        )}
-      </h3>
-      <h3>
-        Published:{" "}
-        {!editMode ? (
-          course.published
-        ) : (
-          <input
-            type="text"
-            value={published}
-            onChange={(e) => setPublished(e.target.value)}
-          />
-        )}
-      </h3>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Course />
+      <EditCourse _id={courseId} />
+    </div>
+  );
+};
 
-      {!editMode ? (
-        <button onClick={() => handleEdit()}>Edit</button>
-      ) : (
-        <button onClick={() => handleSubmit()}>Submit</button>
-      )}
+const Course = () => {
+  const course = useRecoilValue(courseState);
+  const { title, description, price } = course;
+  return (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Card sx={{ width: 345 }} style={{ margin: "20px" }}>
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            height="140"
+            image="https://source.unsplash.com/random"
+            alt="Course"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {title}
+            </Typography>
+            <Typography variant="body1" color="text">
+              {description}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {price}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </div>
+  );
+};
+
+const EditCourse = ({ _id }) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [imageLink, setImageLink] = useState("");
+  const [published, setPublished] = useState("");
+
+  const [course, setCourse] = useRecoilState(courseState);
+
+  const handleEdit = async (_id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:3000/admin/courses/${_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          price,
+          imageLink,
+          published,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+      setCourse({ title, description, price, imageLink, published });
+      alert(data.message);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "20px",
+        }}
+      >
+        <Typography variant="h4">Edit Course</Typography>
+      </div>
+      <br />
+
+      <Card
+        variant="outlined"
+        style={{ width: "400px", margin: "auto", padding: "10px" }}
+      >
+        <TextField
+          style={{ marginBottom: "10px" }}
+          fullWidth
+          variant="outlined"
+          label="Title"
+          type={"text"}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <br />
+
+        <TextField
+          style={{ marginBottom: "10px" }}
+          fullWidth
+          variant="outlined"
+          label="Description"
+          type={"text"}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <br />
+
+        <TextField
+          style={{ marginBottom: "10px" }}
+          fullWidth
+          variant="outlined"
+          label="Price"
+          type={"number"}
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+
+        <br />
+
+        <TextField
+          style={{ marginBottom: "10px" }}
+          fullWidth
+          variant="outlined"
+          label="Image Link"
+          type={"text"}
+          value={imageLink}
+          onChange={(e) => setImageLink(e.target.value)}
+        />
+
+        <br />
+
+        <TextField
+          style={{ marginBottom: "10px" }}
+          fullWidth
+          variant="outlined"
+          label="Published"
+          type={"text"}
+          value={published}
+          onChange={(e) => setPublished(e.target.value)}
+        />
+
+        <br />
+
+        <Button variant="contained" onClick={() => handleEdit(_id)}>
+          Edit Course
+        </Button>
+      </Card>
     </div>
   );
 };
 
 export default CoursePage;
+
+const courseState = atom({
+  key: "courseState",
+  default: "",
+});

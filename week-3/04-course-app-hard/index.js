@@ -68,6 +68,7 @@ mongoose.connection
 app.post('/admin/signup', async (req, res) => {
   try {
     const admin = await Admin.findOne(req.body);
+    console.log(admin);
     if (admin) {
       return res.status(403).json({ message: 'Admin already exists' });
     }
@@ -97,6 +98,17 @@ app.post('/admin/login', async (req, res) => {
     res.status(500).json({ message: "Login failed", name: error.name, explanation: error.explanation });
   }
 });
+
+app.get("/admin/me", authenticateJwt, async (req, res) => {
+  try {
+    res.status(200).json({
+      username: req.user.username
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "User details fetch failed", name: error.name, explanation: error.message })
+  }
+})
 
 app.post('/admin/courses', authenticateJwt, async (req, res) => {
   try {
